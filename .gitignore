@@ -1,0 +1,51 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+build
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+#test cases
+*.test.jsx
+
+# Environment variables
+backend/.env
+backend/.env.production
+backend/.env.stage
+
+frontend/.env
+frontend/.env.production
+frontend/.env.stage
+
+# Frontend
+/Files for LightSail
+
+#Backend
+config.json
+
+backend/certs/
+nginx - original default file/
+default
+eventLoggerVhost.conf
+test.js
+
+changes.patch
