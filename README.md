@@ -9,9 +9,8 @@ Event Logger is a tool designed to help customers log and review events in their
 - Detailed event reports
 - Customizable logging levels
 - Secure and efficient storage
-
--Built frontend using React.js with Vite, hooks, context API, and state management, which allows user to edit/assign priority to received events, filters the event data based on event priority, allows user to download event log or send mail to given mail id. 
--Developed backend using Express.js/Node.JS to receive security alert event logs, extracts event details from 
+- Built frontend using React.js with Vite, hooks, context API, and state management, which allows user to edit/assign priority to received events, filters the event data based on event priority, allows user to download event log or send mail to given mail id.
+- Developed backend using Express.js/Node.JS to receive security alert event logs, extracts event details from 
 the log, stores it in the DB and provides processed data to the frontend.
 
 
