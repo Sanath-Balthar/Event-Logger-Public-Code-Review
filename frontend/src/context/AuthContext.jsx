@@ -97,13 +97,15 @@ export default function AuthContextProvider({children}){
         try{
             const logoutRes = await axios.post(`${API_URL}/auth/signout`,{},{withCredentials:true});
             console.log("LogoutStatus: "+logoutRes.status);
-            if(logoutRes.status===200){
+            // if(logoutRes.status===200){
                 localStorage.clear();
                 setIsAuthenticated(false);
                 window.location.href = "/";
-            }
+            // }
         }catch(error) {
-            console.error('Error logging in:', error);
+            console.error('Error logging out:', error);
+            localStorage.clear();
+            setIsAuthenticated(false);
             window.location.href = "/";
         }
     }

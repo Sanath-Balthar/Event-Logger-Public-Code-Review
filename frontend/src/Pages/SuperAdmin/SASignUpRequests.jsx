@@ -3,6 +3,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 // import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { CircularProgress } from "@mui/material";
 
 
 const API_URL = import.meta.env.VITE_BACKEND_API_URL;
@@ -14,6 +15,7 @@ export const SASignUpRequests=()=>{
     // Approve/Reject button will change the "approve" field in the DB.
 
     const [requests, setRequests]= useState([]);
+    const [loading, setLoading] = useState(false);
     const authContext = useAuth();
     
     useEffect(()=>{
@@ -57,6 +59,7 @@ export const SASignUpRequests=()=>{
 
     async function onApprove(event,username,company,status) {
         event.preventDefault();
+        setLoading(true);
         axios.post(`${API_URL}/superAdmin/setPrimaryAdminRequest`,{company:company, username: username, apprStatus: status},{withCredentials:true})
         .then((response)=>{
             console.log("result : ", response.data)
@@ -65,10 +68,12 @@ export const SASignUpRequests=()=>{
                 // reqs.map((element)=>{
                 //     console.log("Sign Up requests: ", element.username, " : ", element.role)
                 // })
+                setLoading(false);
                 setRequests(reqs)
             } 
         })
         .catch((error)=>{
+            setLoading(false);
             console.log("Error in Signup request: ", error)
             if(error.response.status===401 || error.response.status===403){
                 alert("Session Expired. Please login again!");
@@ -84,13 +89,13 @@ export const SASignUpRequests=()=>{
 
 
     return(
-        <div className="flex justify-center items-start mt-10 min-w-[95%] overflow-auto   ">
-            <div className="w-1/3 p-1 bg-white rounded-lg">
+        <div className="flex justify-center items-start mt-10 w-full md:min-w-[95%] overflow-auto text-xs md:text-base relative ">
+            <div className="w-full md:w-1/2 p-1 bg-white rounded-lg">
                 {
                     requests.length===0
                     ?<h2 className="text-center font-bold">No Sign Up Requests to be approved</h2>
                     :
-                    <table className="w-full font-sans  ">
+                    <table className="w-full font-sans">
                     <thead>
                         <tr>
                             <th className="rounded-l-lg bg-blue-100 ">
@@ -121,13 +126,14 @@ export const SASignUpRequests=()=>{
                             requests.length===0?<></>:(requests.map((element,index)=>{
                                 return(
                                     <tr key={element.company} className="w-full">
-                                        <td><span className="flex justify-center  my-[10px]">{index+1}</span></td>
-                                        <td><span className="flex justify-center  my-[10px]">{element.company}</span></td>
-                                        <td><span className="flex justify-center  my-[10px]">{element.username}</span></td>
-                                        <td><span className="flex justify-center  my-[10px]">{element.role}</span></td>
-                                        <td><span className="flex justify-center  my-[10px]">
-                                            <button className="min-w-[10%] h-[40px] mx-[5px]  px-1 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition" onClick={(e)=>{onApprove(e, element.username,element.company, true)}} ><Check ></Check></button>
-                                            <button className="min-w-[10%] h-[40px] mx-[5px] px-1 py-1 bg-red-500 text-white rounded hover:bg-red-700 transition" onClick={(e)=>{onApprove(e, element.username,element.company,false)}}><Clear></Clear></button></span></td>
+                                        <td><span className="flex justify-center my-[10px]">{index+1}</span></td>
+                                        <td><span className="flex justify-center my-[10px]">{element.company}</span></td>
+                                        <td><span className="flex justify-center my-[10px]">{element.username}</span></td>
+                                        <td><span className="flex justify-center my-[10px]">{element.role}</span></td>
+                                        <td><span className="flex justify-center my-[10px]">
+                                            <button className="md:min-w-[10%] md:h-[40px] mx-[5px]  px-1 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition" onClick={(e)=>{onApprove(e, element.username,element.company, true)}} ><Check ></Check></button>
+                                            <button className="md:min-w-[10%] md:h-[40px] mx-[5px] px-1 py-1 bg-red-500 text-white rounded hover:bg-red-700 transition" onClick={(e)=>{onApprove(e, element.username,element.company,false)}}><Clear></Clear></button>
+                                        </span></td>
                                     </tr>
                                 )
                             }))
@@ -136,6 +142,14 @@ export const SASignUpRequests=()=>{
                     </table>
                 }
             </div>
+            {loading && (
+                <div className=" fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-10">
+                    <div className="flex flex-col items-center">
+                        <CircularProgress/>
+                        <p className="text-white mt-2">Loading...</p>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

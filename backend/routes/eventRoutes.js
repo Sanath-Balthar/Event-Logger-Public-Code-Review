@@ -1,7 +1,7 @@
 const { addCategory, addEvents, addKeywords, delCategory, deleteKW, fetchCategories, getAllEvents, getKWList, getRecentEvents, signUp, updateEventCat, updateKWcategory, userAuth, deleteEvents, connectDB } = require("../functions/dbFunctions");
 const { extractEvent } = require( "../functions/extractEvent");
 const express = require("express");
-const { authMiddleware, authorizeRoles } = require("./middleware");
+const { verifyJWToken, authorizeRoles } = require("./middleware");
 const { default: mongoose } = require("mongoose");
 
 const router = express.Router();
@@ -28,16 +28,21 @@ router.post("/sendEventLog", async (req, res) => {
 
         let addCheck = await addEvents(All_Events_model, eventList)
         if(addCheck){  console.log("Events extracted and added to DB!: "+addCheck); }
+        else{ console.log("Events not added to DB!"); return res.status(500).send({ message: "Failed to send event log due to Backend Server Error. Please contact support team." });}
 
         let kwCheck = await addKeywords(Event_Keywords_model,KWList)
         if(kwCheck){ console.log("Keywords extracted and added to DB!: "+kwCheck); }
+        else{ console.log("Events not added to DB!"); return res.status(500).send({ message: "Failed to send event log due to Backend Server Error. Please contact support team." });}
+
+        return res.status(200).send({ message: "Event log sent successfully" });
 
         } catch (error) {
             console.log("Events update Error inside sendEventLog POST: "+error);
+           return res.status(500).send({ message: "Failed to send event log due to Backend Server Error. Please contact support team." });
         }
 })
 
-router.get("/getAllEvents",authMiddleware,authorizeRoles(["user","admin"]) , async (req, res) => {
+router.get("/getAllEvents",verifyJWToken,authorizeRoles(["user","admin"]) , async (req, res) => {
     const All_Events_model = req.models[1];
     getAllEvents(All_Events_model).then((allEvents)=>{
         console.log("Received All events: "+allEvents[0].eventName);
@@ -49,7 +54,7 @@ router.get("/getAllEvents",authMiddleware,authorizeRoles(["user","admin"]) , asy
     })
 })
 
-router.get("/getRecentEvents",authMiddleware,authorizeRoles(["user","admin"]) , async (req, res) => {
+router.get("/getRecentEvents",verifyJWToken,authorizeRoles(["user","admin"]) , async (req, res) => {
     console.log("Reached recent events");
     const models = req.models;
     const company_name =  req.user.dbName.split("_")[0];
@@ -65,7 +70,7 @@ router.get("/getRecentEvents",authMiddleware,authorizeRoles(["user","admin"]) , 
     })
 })
 
-router.get("/getKeyWords",authMiddleware, authorizeRoles(["admin"]) , async(req,res)=>{
+router.get("/getKeyWords",verifyJWToken, authorizeRoles(["admin"]) , async(req,res)=>{
     const models = req.models;
     const Event_Keywords_model = models[2];
     getKWList(Event_Keywords_model)
@@ -79,7 +84,7 @@ router.get("/getKeyWords",authMiddleware, authorizeRoles(["admin"]) , async(req,
     })
 })
 
-router.get("/getCategories",authMiddleware, authorizeRoles(["user","admin"]) , async(req,res)=>{
+router.get("/getCategories",verifyJWToken, authorizeRoles(["user","admin"]) , async(req,res)=>{
     try{
         const models = req.models;
         const Categories_model = models[3];
@@ -92,7 +97,7 @@ router.get("/getCategories",authMiddleware, authorizeRoles(["user","admin"]) , a
     }
 })
 
-router.post("/save",authMiddleware, authorizeRoles(["admin"]) ,async (req, res) => {
+router.post("/save",verifyJWToken, authorizeRoles(["admin"]) ,async (req, res) => {
     const Event_Keywords_model = req.models[2];
     const All_Events_model = req.models[1];
     let kwList = req.body.keywords;
@@ -107,7 +112,7 @@ router.post("/save",authMiddleware, authorizeRoles(["admin"]) ,async (req, res) 
     //        result.map((element)=>{
     //     console.log("Received Keyword: "+element.keyword+" Category: "+element.category);
     // })
-        return res.send(result);
+        return res.status(200).send(result);
         })
     }else{
         return res.send(false)
@@ -119,22 +124,23 @@ router.post("/save",authMiddleware, authorizeRoles(["admin"]) ,async (req, res) 
     })
 })
 
-router.post("/addKeywords",authMiddleware, authorizeRoles(["admin"]) ,async (req, res) => {
+router.post("/addKeywords",verifyJWToken, authorizeRoles(["admin"]) ,async (req, res) => {
     try {
         const Event_Keywords_model = req.models[2];
         const All_Events_model = req.models[1];
         let kwList = req.body;
-        const addcheck = await addKeywords(Event_Keywords_model,kwList);
+        let kwList_trim = kwList.map((element)=> { return {keyword: element.keyword.trim(), category: element.category.trim() }})
+        const addcheck = await addKeywords(Event_Keywords_model,kwList_trim);
         console.log("Add Keyword check: "+addcheck);
         if(addcheck){
-            const updateCatCheck = await updateEventCat(All_Events_model,kwList)
+            const updateCatCheck = await updateEventCat(All_Events_model,kwList_trim)
             console.log("Update Event Category Res: ",updateCatCheck);
                             
             const kwListRes = await getKWList(Event_Keywords_model);
                 // kwListRes.map((element)=>{
                 //     console.log("Received Keyword: "+element.keyword+" Category: "+element.category);
                 //     }) 
-                return res.send(kwListRes);             
+                return res.status(200).send(kwListRes);             
         }else{
             return res.send(false)
         }
@@ -144,31 +150,27 @@ router.post("/addKeywords",authMiddleware, authorizeRoles(["admin"]) ,async (req
     }
 })
 
-router.post("/addCategory",authMiddleware, authorizeRoles(["admin"]) ,async(req,res)=>{
+router.post("/addCategory",verifyJWToken, authorizeRoles(["admin"]) ,async(req,res)=>{
     try{
         const Categories_model = req.models[3];
         const addCat = req.body;
         const addCheck = await addCategory(Categories_model,addCat);
         console.log("Add Category check: "+addCheck);
-
+        let catlist = [];
         if(addCheck){
-            const fetchRes = await fetchCategories(Categories_model);
-            console.log("Fetch Categories: "+fetchRes);
-            if(fetchRes && fetchRes.length!==0){
-                return res.send(fetchRes)
-            }else{
-                console.log("Failed to fetch categories inside /addCategory")
-            }
+            catlist = await fetchCategories(Categories_model);
+            console.log("Fetch Categories: "+catlist);
+            return res.status(200).send(catlist)
         }else{
             return res.send(false)
-        }         
+    }    
 }catch(err){
     console.log("Error: "+err);
     return res.send(false)
 }
 })
 
-router.post("/deleteKeyword",authMiddleware, authorizeRoles(["admin"]) ,async(req,res)=>{
+router.post("/deleteKeyword",verifyJWToken, authorizeRoles(["admin"]) ,async(req,res)=>{
    try {
         const All_Events_model = req.models[1];
         const Event_Keywords_model = req.models[2];
@@ -193,19 +195,16 @@ router.post("/deleteKeyword",authMiddleware, authorizeRoles(["admin"]) ,async(re
    }
 })
 
-router.post("/deleteCategory",authMiddleware, authorizeRoles(["admin"]) ,async(req,res)=>{
+router.post("/deleteCategory",verifyJWToken, authorizeRoles(["admin"]) ,async(req,res)=>{
     try{
         const Categories_model = req.models[3];
         let delCat = req.body;
         const delCheck = await delCategory(Categories_model,delCat);
+        let catlist = [];
         if(delCheck){
-            const fetchRes = await fetchCategories(Categories_model);
-            console.log("Fetch Categories: "+fetchRes);
-            if(fetchRes && fetchRes.length!==0){
-                return res.send(fetchRes)
-            }else{
-                console.log("Failed fetch categories inside /deleteCategory")
-            }
+            catlist = await fetchCategories(Categories_model);
+            console.log("Fetch Categories: "+catlist);
+            return res.send(catlist)
         }else{
             return res.send(false)
     }     
@@ -215,7 +214,7 @@ router.post("/deleteCategory",authMiddleware, authorizeRoles(["admin"]) ,async(r
 }
 })
 
-router.post("/deleteAllEvents",authMiddleware, authorizeRoles(["admin"]) ,async(req,res)=>{
+router.post("/deleteAllEvents",verifyJWToken, authorizeRoles(["admin"]) ,async(req,res)=>{
     try{
         const All_Events_model = req.models[1];
         const delCheck = await deleteEvents(All_Events_model);

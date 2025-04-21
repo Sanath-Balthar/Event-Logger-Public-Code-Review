@@ -11,3 +11,4 @@ module.exports = (connection) => {
     return connection.model('Company_Details', CompanySchema);
   };
 
+// Passing the connection.model function as export because we need to create this collection everytime a new db is created

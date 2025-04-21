@@ -44,11 +44,17 @@ export default function RegisterCompany(){
             }
           } catch (error) {
             console.error(error);
+            if(error.response!==undefined){
                 if(error.response.status===500){
                     alert("Registration failed. Please contact support team!")
                 }else if(error.response.status===409){
                     alert("Company already registered");
+                }else{
+                    alert("Registration failed. Please contact support team!")
                 }
+            }else{
+                alert("Registration failed. Please contact support team!")
+            }
           }
     }
 
@@ -61,9 +67,9 @@ export default function RegisterCompany(){
         <div className="flex flex-col items-center justify-center min-h-screen bg-blue-100 ">
         {/* Heading Div*/}
              <img src={kalmaneTechImg} alt="Logo" className="h-[50px] bg-blue-100 mb-5"/>
-             <div className="flex-row min-w-[500px] min-h-[500px] m-5 items-center justify-center shadow-xl rounded-xl bg-white">
-                <div className="flex w-full h-[100px] justify-center items-center bg-blue-800 text-white rounded-t-xl">
-                    <h1 className=' text-xl font-bold text-center'>Company Registration Form</h1>
+             <div className="flex-row md:min-w-[500px] md:min-h-[500px] m-5 items-center justify-center shadow-xl rounded-xl bg-white">
+                <div className="flex w-full h-[50px] md:h-[100px] justify-center items-center bg-blue-800 text-white rounded-t-xl">
+                    <h1 className='text-sm md:text-xl font-bold text-center'>Company Registration Form</h1>
                 </div> 
 
                 <form className="flex flex-col pt-[20px] justify-center items-center"  onSubmit={companyRegisterHandler}>

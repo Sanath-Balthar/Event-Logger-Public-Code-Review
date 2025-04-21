@@ -1,7 +1,7 @@
 // import React from "react"
 // import { useAuth } from "../../context/AuthContext";
+import { Header } from "../../components/Header";
 import { SASideBar } from "./SASideBar";
-import { Header } from "../Header";
 import { SASignUpRequests } from "./SASignUpRequests";
 
 // const API_URL = import.meta.env.VITE_BACKEND_API_URL;
@@ -29,11 +29,11 @@ export default function SADashboard(){
                     {/* Main Content Section */}
                     <div className="flex-col w-full">
                         <div>
-                            <h2 className="mx-[60px] my-[10px] p-[10px] rounded-lg font-bold text-xl text-center text-blue-900 bg-white ">SuperAdmin Dashboard</h2>
+                            <h2 className="mx-[60px] my-[10px] p-[10px] rounded-lg font-bold text-sm md:text-xl text-center text-blue-900 bg-white ">SuperAdmin Dashboard</h2>
                         </div>
-                        <div className="flex flex-row w-full px-10">
+                        <div className="flex flex-row w-full md:px-10">
                             {/* New company admin request Section */}
-                            <div className="w-[100%] p-5">
+                            <div className="w-[100%] p-3 md:p-5">
                                 <SASignUpRequests/>
                             </div>
                             {/* Contracts Section */}

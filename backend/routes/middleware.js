@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 const config = require("../config.json");
 const { default: mongoose } = require("mongoose");
 
-const authMiddleware = (req, res, next) => {
+const verifyJWToken = (req, res, next) => {
     try {
         const token = req.cookies.jwt;
         console.log("token received: "+token)
@@ -20,7 +20,7 @@ const authMiddleware = (req, res, next) => {
           
         next();
     } catch (error) {
-        console.log("Error in authmiddleware: ",error)
+        console.log("Error in verifyJWToken: ",error)
         return res.status(401).json({ error: "Invalid token" });
     }
 };
@@ -34,11 +34,11 @@ const authorizeRoles = (roles) => {
             }
             next();
        } catch (error) {
-        console.log("Error in authmiddleware: ",error)
+        console.log("Error in verifyJWToken: ",error)
         return res.status(403).json({ error: "Unauthorized" });
        }
     };
 };
 
 
-module.exports={authMiddleware,authorizeRoles}
+module.exports={verifyJWToken,authorizeRoles}

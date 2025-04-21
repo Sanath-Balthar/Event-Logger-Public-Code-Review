@@ -5,9 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build:dev": "vite build",
+    "build:dev": "cross-env NODE_ENV=development vite build --mode development",
     "build:stage": "cross-env NODE_ENV=stage vite build --mode stage",
-    "build:prod": "vite build",
+    "build:prod": "cross-env NODE_ENV=production vite build --mode production",
     "preview": "vite preview",
     "lint": "eslint .",
     "format": "prettier --write .",
@@ -23,10 +23,12 @@
     "axios": "^1.7.9",
     "dayjs": "^1.11.13",
     "dotenv": "^16.4.7",
+    "mqtt": "^5.10.3",
     "prop-types": "^15.8.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-router-dom": "^7.1.5"
+    "react-router-dom": "^7.1.5",
+    "socket.io-client": "^4.8.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",

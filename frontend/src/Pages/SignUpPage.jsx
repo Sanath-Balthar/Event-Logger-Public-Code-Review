@@ -44,9 +44,9 @@ export default function SignUpPage(){
         <div className="flex flex-col items-center justify-center min-h-screen bg-blue-100 ">
         {/* Heading Div*/}
              <img src={kalmaneTechImg} alt="Logo" className="h-[50px] bg-blue-100 mb-5"/>
-             <div className="flex-row min-w-[500px] min-h-[500px] m-5 items-center justify-center shadow-xl rounded-xl bg-white">
-                <div className="flex w-full h-[100px] justify-center items-center bg-blue-800 text-white rounded-t-xl">
-                    <h1 className=' text-xl font-bold text-center'>Sign Up to Event Logger Dashboard</h1>
+             <div className="flex-row md:min-w-[500px] md:min-h-[500px] m-5 items-center justify-center shadow-xl rounded-xl bg-white">
+                <div className="flex w-full h-[50px] md:h-[100px] justify-center items-center bg-blue-800 text-white rounded-t-xl">
+                    <h1 className=' text-sm md:text-xl p-2 font-bold text-center'>Sign Up to Event Logger Dashboard</h1>
                 </div> 
 
                 {/* <div className="flex flex-col pt-[10px] justify-center items-center">

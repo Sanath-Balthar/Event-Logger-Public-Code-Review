@@ -13,8 +13,8 @@ export const Header = ({heading})=>{
          <>
         {/* {
             isDashboard? */}
-            <div className="flex h-[100px] justify-center items-center  border-b-[5px] border-white text-white bg-blue-200">
-                <h2 className="px-[75px] py-[10px] rounded-lg font-bold text-xl text-center text-blue-900 bg-white ">{heading}</h2>
+            <div className="flex h-[50px] lg:h-[100px] justify-center items-center  border-b-[5px] border-white text-white bg-blue-200">
+                <h2 className="px-[20px] py-[5px]  lg:px-[75px] lg:py-[10px] rounded-lg font-bold text-sm lg:text-xl text-center text-blue-900 bg-white ">{heading}</h2>
                 {/* <img src={kalmaneTechImg} alt="Logo" className="w-[350px] h-[60px] p-[5px] text-center bg-white rounded-2xl"/> */}
             </div> 
             

@@ -65,8 +65,8 @@ export default function Widgets(){
                     return(
             
                     <div className='flex justify-left m-2' key={element.name}>
-                        <PrivacyTipTwoToneIcon className="bg-white-500 " sx={{width:35, height:35}}/>
-                        <button className="flex items-center px-2 hover:bg-blue-900 hover:text-white rounded transition" onClick={(event)=>onWidgetClick(event,element.name)}><span>{element.name}</span></button>
+                        <PrivacyTipTwoToneIcon className="bg-white-500" sx={{width:{xs:20, sm:20, md:35, lg:35, xl:35}, height:{xs:20, sm:20, md:35, lg:35, xl:35}}}/>
+                        <button className="flex items-center md:px-2 text-sm md:text-base hover:bg-blue-900 hover:text-white rounded transition" onClick={(event)=>onWidgetClick(event,element.name)}><span>{element.name}</span></button>
                     </div>           
                     )
                     }

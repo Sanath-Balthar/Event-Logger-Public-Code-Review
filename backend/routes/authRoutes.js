@@ -3,13 +3,13 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { userAuth, signUp,connectDB, setReqAppr, fetchReq } = require("../functions/dbFunctions");
-const { authMiddleware,authorizeRoles } = require("./middleware");
+const { verifyJWToken,authorizeRoles } = require("./middleware");
 const sendMail = require("../functions/sendMail");
 
 const router = express.Router();
 
 router.post("/CompanyRegistration", async (req,res)=>{
-    console.log("Reached SignUP ");
+    console.log("Reached CompanyRegistration ");
     
     try {
         const {company,primary_admin,password,email} = req.body;
@@ -31,22 +31,24 @@ router.post("/CompanyRegistration", async (req,res)=>{
         const companyCheck = await userAuth(Company_Details,{company_name: company_trim});
         console.log("companyCheck: ",companyCheck)
         if(!companyCheck){
-             Company_Details.create({company_name: company_trim})
-            .then((result)=>{console.log("Company added: ",result);})
-            .catch((err)=>{
-                console.log("Error in adding company: ",err);
-                return res.status(500).send({ message: 'An error occurred on the DB'});
-            });
+
+            try {
+                const companyResult = await Company_Details.create({company_name: company_trim})
+                console.log("Company added: ", companyResult);
+            } catch (err) {
+                console.log("Error in adding company: ", err);
+                return res.status(500).send({ message: "An error occurred on the DB" });
+            }
+
+            try {
+                const adminResult = await Primary_Admins.create({company_name:company_trim, username: primary_admin_trim, password:password_trim, role: "admin", email: email_trim })
+                console.log("Admin approval requested: ", adminResult);
+                return res.status(200).send({ message: "Company Registration sent for approval" });
+            } catch (err) {
+                console.log("Error in adding admin: ", err);
+                return res.status(500).send({ message: "An error occurred on the DB" });
+            }
             
-            Primary_Admins.create({company_name:company_trim, username: primary_admin_trim, password:password_trim, role: "admin", email: email_trim })
-            .then((result)=>{
-                console.log("Admin approval requested: ",result);
-                return res.status(200).send({message: "Company Registerion sent for approval"}); 
-            })
-            .catch((err)=>{
-                console.log("Error in adding admin: ",err);
-               return res.status(500).send({ message: 'An error occurred on the DB'});
-            });
         }else{
            return res.status(409).send({message: "Company already registered"})
         }
@@ -243,7 +245,7 @@ router.post("/password-reset/:token", async (req, res) => {
         console.log("Token received: "+token);
         const password_trim = password.trim();
         if (!token) return res.status(400).send({ message: "Token is required" });
-        if (!password_trim) return res.status(400).send({ message: "Password is required" });
+        if (!password_trim) return res.status(402).send({ message: "Password is required" });
 
         const pass_bcrypt = await bcrypt.hash(password_trim,10);
         const decoded =jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
@@ -272,7 +274,7 @@ router.post("/signout", (req, res) => {
 });
 
 // Only for Admin - To approve new user signup requests
-router.get("/fetchSignUpRequest", authMiddleware,authorizeRoles(["admin"]), async (req,res)=>{
+router.get("/fetchSignUpRequest", verifyJWToken,authorizeRoles(["admin"]), async (req,res)=>{
     console.log("Reached fetch signup request after middleware auth")
     const User_model = req.models[0]
     fetchReq(User_model)
@@ -290,7 +292,7 @@ router.get("/fetchSignUpRequest", authMiddleware,authorizeRoles(["admin"]), asyn
     })
 })
 
-router.post("/setSignUpRequest", authMiddleware,authorizeRoles(["admin"]), async (req,res)=>{
+router.post("/setSignUpRequest", verifyJWToken,authorizeRoles(["admin"]), async (req,res)=>{
     const { username, apprStatus } = req.body;
     const  username_trim = username.trim();
     const User_model = req.models[0];

@@ -19,19 +19,25 @@ export default function SALoginPage(){
       }, []);
 
       const loginCheck = async ()=>{
-        const isAuth = localStorage.getItem("Authenticated");
-        if(isAuth){
-            const confirmLogout = window.confirm("Are you sure you want to log out?")
-            if(confirmLogout){
-                const logoutRes = await axios.post(`${import.meta.env.VITE_BACKEND_API_URL}/auth/signout`,{},{withCredentials:true});
-                console.log("LogoutStatus: "+logoutRes.status);
-                if(logoutRes.status===200){
-                    localStorage.removeItem("Authenticated");
-                    window.location.href = "/SASignIn";
+        try {
+            const isAuth = localStorage.getItem("Authenticated");
+            if(isAuth){
+                const confirmLogout = window.confirm("Are you sure you want to log out?")
+                if(confirmLogout){
+                    const logoutRes = await axios.post(`${import.meta.env.VITE_BACKEND_API_URL}/auth/signout`,{},{withCredentials:true});
+                    console.log("LogoutStatus: "+logoutRes.status);
+                    // if(logoutRes.status===200){
+                        localStorage.removeItem("Authenticated");
+                        window.location.href = "/SASignIn";
+                    // }
+                }else{
+                    navigate(-1);
                 }
-            }else{
-                navigate(-1);
             }
+        } catch (error) {
+                console.log(error);
+                localStorage.removeItem("Authenticated");
+                window.location.href = "/SASignIn";
         }
       }
 
@@ -72,25 +78,25 @@ export default function SALoginPage(){
      * Function to handle forgot password functionality. Currently unimplemented.
      * @TODO Implement forgot password functionality.
      */
-    function forgotPwdHandler(){
+    // function forgotPwdHandler(){
 
-    }
+    // }
 
     return(
         <div className="flex flex-col items-center justify-center min-h-screen bg-blue-100  ">
             {/* Heading Div*/}
             <img src={kalmaneTechImg} alt="Logo" className="h-[50px] bg-blue-100 mb-5"/>
-                <div className="flex-row min-w-[500px] min-h-[500px] m-5 items-center justify-center shadow-xl rounded-xl bg-white">
-                <div className="flex w-full h-[100px] justify-center items-center bg-blue-800 text-white rounded-t-xl">
-                    <h1 className=' text-xl font-bold text-center'>Sign In to SuperAdmin Dashboard</h1>
+                <div className="flex-row md:min-w-[500px] md:min-h-[500px] m-5 items-center justify-center shadow-xl rounded-xl bg-white">
+                <div className="flex w-full h-[50px] md:h-[100px] justify-center items-center bg-blue-800 text-white rounded-t-xl">
+                    <h1 className=' md:text-xl p-2 font-bold text-center'>Sign In to SuperAdmin Dashboard</h1>
                 </div> 
                     <form className="flex flex-col pt-[50px] justify-center items-center "  onSubmit={signInHandler}>
                         <input type="text" placeholder="Username" name="Username" className="text-center m-3 border-2 border-gray-400 focus:border-black rounded-md  " onChange={(e)=>authContext.setUsername(e.target.value)} required></input>
                         <input type="password" placeholder="Password" name="Password" className="text-center m-3 border-2 border-gray-400 focus:border-black rounded-md  " onChange={(e)=>authContext.setPassword(e.target.value)} required></input>
                         <button type="submit" className=" w-[150px] text-white my-3 py-2 rounded bg-blue-600 hover:bg-blue-900 transition"> Submit</button>
-                        <div className="pb-10" >
+                        {/* <div className="pb-10" >
                             <button type="button" className=" w-[150px] text-white m-3 p-2 rounded bg-blue-600 hover:bg-blue-900 transition" onClick={forgotPwdHandler}>Forgot Password?</button>
-                        </div>
+                        </div> */}
                     </form>
                 </div>
 

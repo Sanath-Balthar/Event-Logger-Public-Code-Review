@@ -8,9 +8,9 @@ const bcrypt = require("bcryptjs");
 // const CompanyModelFunc = require("../models/Companies/CompanyDetails.js");
 
     
-async function connectDB(company){
+async function connectDB(companyDB){
     try {
-        const cloud_URL = `mongodb+srv://${config.user}:${config.password}@${config.cluster}/${company}?retryWrites=true&w=majority&appName=Cluster0`
+        const cloud_URL = `mongodb+srv://${config.user}:${config.password}@${config.cluster}/${companyDB}?retryWrites=true&w=majority&appName=Cluster0`
         // const dbConnectcheck =  mongoose.connections;
         
         // let DbArr =  dbConnectcheck.map((element)=>{
@@ -18,10 +18,10 @@ async function connectDB(company){
         //                     return element.name;
         //                 }).filter((element)=>{return element!=="undefined"})
 
-        const existingConnection =  mongoose.connections.filter((element)=>{return element.name===company})
+        const existingConnection =  mongoose.connections.filter((element)=>{return element.name===companyDB})
         
 
-        // if(DbArr.length!==0 && DbArr.includes(company)){
+        // if(DbArr.length!==0 && DbArr.includes(companyDB)){
         if(existingConnection.length !==0){
             // existingConnection will be an array with single element since company name is unique. Hence using existingConnection[0]
             const models = Object.values(existingConnection[0].models);
@@ -32,7 +32,7 @@ async function connectDB(company){
             await newConnection.asPromise();
             const dbName = newConnection.db.databaseName;
             console.log("DB connection established: ",dbName);
-            if(company==="companies"){
+            if(companyDB==="companies"){
                 const Company_Details = require("../models/Companies/CompanyDetails")(newConnection);
                 const Primary_Admins = require("../models/Companies/Primary_Admins")(newConnection);
                 // console.log("DB Name: ", connection.name);
@@ -43,6 +43,7 @@ async function connectDB(company){
                 const All_Events = require("../models/Company_EventLogger/AllEvents")(newConnection);
                 const Event_Keywords = require("../models/Company_EventLogger/EventKeywords")(newConnection);
                 const Categories = require("../models/Company_EventLogger/Categories")(newConnection);
+
                 console.log("DB models: ",User," ",All_Events," ",Event_Keywords," ",Categories);
                 return [User, All_Events, Event_Keywords, Categories];
             }                
@@ -236,7 +237,7 @@ async function updateKWcategory(Event_Keywords,kwList){
         // console.log("Keyword: "+element.keyword+" Category: "+element.category);
         return Event_Keywords.findOneAndUpdate({keyword:element.keyword},{category:element.category},{new:true}).
         then((result)=>{
-           console.log("Keyword Category updated: "+result);
+           console.log("Keyword Category updated: ",result);
            if(index===kwList.length-1){
             updateFlag = true;
         }
@@ -267,7 +268,7 @@ async function updateEventCat(All_Events, kwList){
         console.log("eventName: "+element.keyword+" Category: "+element.category);
         return All_Events.updateMany({eventName:element.keyword},{category:element.category}).
         then((result)=>{
-           console.log("Event Category updated: "+result);
+           console.log("Event Category updated: ",result);
            if(index===kwList.length-1){
             updateFlag = true;
         }
@@ -321,7 +322,8 @@ async function fetchCategories(Categories){
         return resCatList;
     }).catch((err)=>{    
         console.log("Error: "+err);
-        return [];
+        throw new Error("Error while fetching category list")
+        // return [];
     });
     return catList;
 }

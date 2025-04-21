@@ -1,6 +1,6 @@
 const express = require("express");
 const { fetchReq, setReqAppr, connectDB, changeMode, signUp, userAuth } = require("../functions/dbFunctions");
-const { authMiddleware, authorizeRoles } = require("./middleware");
+const { verifyJWToken, authorizeRoles } = require("./middleware");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const { default: mongoose } = require("mongoose");
@@ -53,7 +53,7 @@ router.post("/SignIn", async (req,res)=>{
 });
 
 // Only for SuperAdmin - To approve new user signup requests
-router.get("/PrimaryAdminRequests", authMiddleware,authorizeRoles(["SuperAdmin"]), async (req,res)=>{
+router.get("/PrimaryAdminRequests", verifyJWToken,authorizeRoles(["SuperAdmin"]), async (req,res)=>{
     console.log("Reached PrimaryAdminRequests after middleware auth")
     const Primary_Admins = req.models[1]
     console.log("Db model: ", Primary_Admins )
@@ -71,7 +71,7 @@ router.get("/PrimaryAdminRequests", authMiddleware,authorizeRoles(["SuperAdmin"]
     })
 })
 
-router.post("/setPrimaryAdminRequest", authMiddleware,authorizeRoles(["SuperAdmin"]), async (req,res)=>{
+router.post("/setPrimaryAdminRequest", verifyJWToken,authorizeRoles(["SuperAdmin"]), async (req,res)=>{
    try {
      const {company, username, apprStatus } = req.body;
      const  company_trim = company.trim();
@@ -211,7 +211,7 @@ router.post("/setPrimaryAdminRequest", authMiddleware,authorizeRoles(["SuperAdmi
     
 })
 
-router.get("/fetchCompanies",authMiddleware,authorizeRoles(["SuperAdmin"]),async(req,res)=>{
+router.get("/fetchCompanies",verifyJWToken,authorizeRoles(["SuperAdmin"]),async(req,res)=>{
 
     try {
         console.log("Reached Fetch Companies")
@@ -244,8 +244,8 @@ router.get("/fetchCompanies",authMiddleware,authorizeRoles(["SuperAdmin"]),async
     }
 })
 
-router.post("/modeChange",authMiddleware,authorizeRoles(["SuperAdmin"]),async(req,res)=>{
-try {
+router.post("/modeChange",verifyJWToken,authorizeRoles(["SuperAdmin"]),async(req,res)=>{
+    try {
     
         console.log("Reached mode Change")
         const companyArr = req.body;
@@ -258,24 +258,29 @@ try {
         // const company = dbName.split("_")[0];
 
         companyArr.map(async(element)=>{
-            await Company_Details.findOneAndUpdate({company_name: element.company},{mode: element.mode},{new:true})
-            .then((result)=>{
-                console.log("Company result", result)
-                if(!result){
-                    return res.status(500).send({ message: 'An Error occured at backend server!' });
+            const updateRes = await Company_Details.findOneAndUpdate({company_name: element.company},{mode: element.mode},{new:true});
+
+            if(!updateRes){
+                return res.status(500).send({ message: 'An Error occured at backend server!' });                
+            }else{
+                const result = await Company_Details.find();                 
+                console.log("Company result", result);
+                if(result){
+                    const companies = result.map((element)=>{
+                        return {company: element.company_name, mode: element.mode }
+                    })
+                    return res.status(200).send(companies)
+                }else{
+                    return res.status(204).send({ message: "Company not found!" })
                 }
-                
-            })
-            .catch((error)=>{
-                console.log("Error in companies fetch", error)
-                return res.status(500).send({ message: 'An Error occured at backend server!' });
-            })
-        })
-    
-       
-} catch (error) {
-    console.log("Error in companies fetch", error)
-}
+            }
+        })   
+               
+    } catch (error) {
+        console.log("Error in companies fetch", error)
+        return res.status(500).send({ message: 'An Error occured at backend server!' });
+    }
+
 })
 
 module.exports = router;

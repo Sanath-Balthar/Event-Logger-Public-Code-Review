@@ -9,6 +9,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import axios from "axios";
 import SortIcon from '@mui/icons-material/Sort';
 import PropTypes from "prop-types";
+import { CircularProgress } from "@mui/material";
 
 const API_URL = import.meta.env.VITE_BACKEND_API_URL;
 
@@ -21,6 +22,7 @@ export default function ListEvents({eventList, isDashboard}){
         const [data, setData] = useState(eventList);
         const [startDate, setStartDate] = useState(null);
         const [endDate, setEndDate] = useState(null);
+        const [loading, setLoading] = useState(false);
         // const hasUE1run = useRef(false);
 
         useEffect(()=>{
@@ -95,24 +97,50 @@ export default function ListEvents({eventList, isDashboard}){
         const blob = new Blob([text], { type: "text/plain" });
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
-        link.download = "event_log.txt";
+        const now = new Date();
+        const options = { timeZone: "Asia/Kolkata", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit"};
+        const formattedDate = new Intl.DateTimeFormat("en-IN", options).format(now).replace(/[/, ]/g, "-").replace(/:/g, "-");
+        console.log("File name", `event_log_${formattedDate}.txt`)
+        link.download = `event_log_${formattedDate}.txt`;
         link.click();
     };
 
     const sendEmail = async () => {
-        const email = prompt("Enter recipient email:");
-        if (!email) return alert("Email is required");
+        try {
+            const email = prompt("Enter recipient email:");
+            if (!email) return alert("Email is required");
+    
+            console.log("Reached sendEmail")
+            setLoading(true);
+    
+            // Generate the text file as a Blob
+            const text = data.map(element => `${element.timeStamp}, ${element.eventName}, ${element.category}`).join("\n");
+            const blob = new Blob([text], { type: "text/plain" });
 
-        console.log("Reached sendEmail")
-        axios.post(`${API_URL}/sendMail`,{email: email, data: data},{withCredentials:true})
-        .then((response)=>{ 
+            const now = new Date();
+            const options = { timeZone: "Asia/Kolkata", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit"};
+            const formattedDate = new Intl.DateTimeFormat("en-IN", options).format(now).replace(/[/, ]/g, "-").replace(/:/g, "-");
+            console.log("File name", `event_log_${formattedDate}.txt`)
+    
+            // Create a FormData object
+            const formData = new FormData();
+            formData.append("email", email); // Add the recipient email
+            formData.append("file", blob, `event_log_${formattedDate}.txt`); // Add the file with a name
+    
+            console.log("Filename generated: ",`event_log_${formattedDate}.txt`)
+    
+            const response = await axios.post(`${API_URL}/sendMail`,formData,{withCredentials:true, headers: {
+                "Content-Type": "multipart/form-data", // Required for file uploads
+            },})
+
+            setLoading(false);
             console.log("response: "+response.data);
-            if(response.status===200) alert("Mail Sent!")
-                else alert("Mail not sent. Check the email id submitted")
-        })
-        .catch((err)=>{
-            const errData = err.response.data.error;
-            console.log("Error in sendEmail: ",errData)
+            if(response.status===200){alert("Mail Sent!")}
+            else{alert("Mail not sent. Check the email id submitted")}
+
+        } catch (error) {
+            const errData = error.response.data.error;
+            console.log("Error in sendEmail: ",error)
             
             if(errData=="Invalid token"){
                 alert("Session Expired! Please login again")
@@ -121,14 +149,20 @@ export default function ListEvents({eventList, isDashboard}){
             }else if(errData=="Unauthorized"){
                 alert("Forbidden, insufficient permissions!")
                 window.location.href="/dashboard"
+            }else if(error.response.status===550){
+                alert("Invalid email id")
+            }else if (error.response.status===554){
+                alert("Mail not sent! Try again after sometime or contact support team")
+            }else{
+                alert("Issue at the backend server. Try again after logging out and logging in again or please contact support team")
             }
-        }) 
+        } 
 
     };
 
     return(
 
-            <div className="w-full">
+            <div className="w-full text-xs lg:text-base relative">
                 {
                     !isDashboard?
                     (
@@ -137,7 +171,7 @@ export default function ListEvents({eventList, isDashboard}){
                     <label className="m-2">End Date: <input type="datetime-local" value={endDate} onChange={e => setEndDate(e.target.value)} required/></label> */}
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <div className="bg-white m-5" >
-                            <DateTimePicker  label="Start Date"
+                            <DateTimePicker  label="Start Date"               
                                 onChange={startDateChange}
                                 viewRenderers={{
                                     hours: renderTimeViewClock,
@@ -174,7 +208,7 @@ export default function ListEvents({eventList, isDashboard}){
                                     </span>
                                 </th>
                                 <th className="rounded-r-lg bg-blue-100" onClick={()=>{handleSort("category")}}>
-                                    <span className="flex flex-row justify-start items-center text-left   my-[10px]">
+                                    <span className="flex flex-row justify-center lg:justify-start items-center text-left   my-[10px]">
                                     <SortIcon/> <p className="mx-1">Category</p>
                                     </span>
                                 </th>
@@ -190,8 +224,8 @@ export default function ListEvents({eventList, isDashboard}){
                                         <tr className="h-full" key={index}>
                                             {/* <td className="text-left px-[10px] py-[5px]">{arrEvent.index}</td> */}
                                             <td className=""><span className="flex text-left w-full  my-[10px]">{new Date(arrEvent.timeStamp).toLocaleString("en-US", { timeZone: "Asia/Kolkata" })}</span></td>
-                                            <td><span className="flex text-left w-full  my-[10px]">{arrEvent.eventName}</span></td>
-                                            <td><span className="flex text-left w-full  my-[10px]">{arrEvent.category===""?"Unassigned":arrEvent.category}</span></td>
+                                            <td><span className="flex text-left w-full my-[10px]">{arrEvent.eventName}</span></td>
+                                            <td className="text-center lg:text-left"><span className="lg:flex w-full my-[10px]">{arrEvent.category===""?"Unassigned":arrEvent.category}</span></td>
                                         </tr>
                                     )
                                 })
@@ -214,6 +248,14 @@ export default function ListEvents({eventList, isDashboard}){
                 </>
                 ):<></>
                 }
+                {loading && (
+                    <div className=" fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-10">
+                        <div className="flex flex-col items-center">
+                            <CircularProgress />
+                            <p className="text-white mt-2">Loading...</p>
+                        </div>
+                    </div>
+                )}
             </div>
     )
 

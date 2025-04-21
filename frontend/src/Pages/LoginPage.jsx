@@ -12,7 +12,7 @@ export default function LoginPage(){
 
     useEffect(() => {
         const isAuth = localStorage.getItem("Authenticated");
-        // console.log("auth: ",isAuth);
+        console.log("auth: ",isAuth);
         if(isAuth){
             const confirmLogout = window.confirm("Are you sure you want to log out?")
             if(confirmLogout){
@@ -58,11 +58,11 @@ export default function LoginPage(){
         <div className="flex flex-col items-center justify-center min-h-screen bg-blue-100  ">
             {/* Heading Div*/}
             <img src={kalmaneTechImg} alt="Logo" className="h-[50px] bg-blue-100 mb-5"/>
-                <div className="flex-row min-w-[500px] min-h-[500px] m-5 items-center justify-center shadow-xl rounded-xl bg-white">
-                <div className="flex w-full h-[100px] justify-center items-center bg-blue-800 text-white rounded-t-xl">
-                    <h1 className=' text-xl font-bold text-center'>Sign In to Event Logger Dashboard</h1>
+                <div className="flex-row md:min-w-[500px] md:min-h-[500px] m-5 items-center justify-center shadow-xl rounded-xl bg-white">
+                <div className="flex w-full h-[50px] md:h-[100px] justify-center items-center bg-blue-800 text-white rounded-t-xl">
+                    <h1 className=' md:text-xl p-2 font-bold text-center'>Sign In to Event Logger Dashboard</h1>
                 </div> 
-                    <form className="flex flex-col pt-[50px] justify-center items-center "  onSubmit={signInHandler}>
+                    <form className="flex flex-col pt-2 md:pt-[50px] justify-center items-center "  onSubmit={signInHandler}>
                         <input type="text" placeholder="Company Name" name="CompanyName" className="text-center m-3 border-2 border-gray-400 focus:border-black rounded-md " onChange={(e)=>authContext.setCompany(e.target.value)} required></input>
                         <input type="text" placeholder="Username" name="Username" className="text-center m-3 border-2 border-gray-400 focus:border-black rounded-md  " onChange={(e)=>authContext.setUsername(e.target.value)} required></input>
                         <input type="password" placeholder="Password" name="Password" className="text-center m-3 border-2 border-gray-400 focus:border-black rounded-md  " onChange={(e)=>authContext.setPassword(e.target.value)} autoComplete="off" required></input>
@@ -71,19 +71,20 @@ export default function LoginPage(){
                                 {/* <InputLabel>Role</InputLabel> */}
                                 <Select value={authContext.role} onChange={(e)=>{ authContext.setRole(e.target.value) }}>
                                     <MenuItem value={"Choose Role"}>Choose Role</MenuItem>
-                                    <MenuItem value={"admin"}>Admin</MenuItem>
-                                    <MenuItem value={"user"}>User</MenuItem>     
+                                    <MenuItem value={"admin"}>admin</MenuItem>
+                                    <MenuItem value={"user"}>user</MenuItem>     
                                 </Select>
                             </FormControl>
                         </Box>
-                        <button type="submit" className=" w-[150px] text-white my-3 py-2 rounded bg-blue-600 hover:bg-blue-900 transition"> Submit</button>
-                        <div className="pb-2" >
-                            <button type="button" className=" w-[150px] text-white m-3 p-2 rounded bg-blue-600 hover:bg-blue-900 transition"  onClick={signupHandler}>Sign Up</button>
-                            <button type="button" className=" w-[150px] text-white m-3 p-2 rounded bg-blue-600 hover:bg-blue-900 transition"  onClick={registerHandler}>Register Company</button>
+                        <button type="submit" className=" w-[150px] text-white my-3 md:py-2 rounded bg-blue-600 hover:bg-blue-900 transition"> Submit</button>
+                        <div className="md:pb-2" >
+                            <button type="button" className=" w-[150px] text-white m-3 md:p-2 rounded bg-blue-600 hover:bg-blue-900 transition" onClick={forgotPwdHandler}>Forgot Password?</button>
                         </div>
-                        <div className="pb-10" >
-                            <button type="button" className=" w-[150px] text-white m-3 p-2 rounded bg-blue-600 hover:bg-blue-900 transition" onClick={forgotPwdHandler}>Forgot Password?</button>
+                        <div className="flex flex-col md:flex md:flex-row md:pb-10" >
+                            <button type="button" className=" w-[150px] text-white m-3 md:p-2 rounded bg-blue-600 hover:bg-blue-900 transition"  onClick={signupHandler}>Sign Up</button>
+                            <button type="button" className=" w-[150px] text-white m-3 md:p-2 rounded bg-blue-600 hover:bg-blue-900 transition"  onClick={registerHandler}>Register Company</button>
                         </div>
+                        
                     </form>
                 </div>
 

@@ -59,12 +59,16 @@ export default function PasswordReset(){
                 }
         }catch (error) {
             console.error('Error logging in:', error);
-            if(error.response.status===401){
-                alert("Incorrect mail id")
+            if (error.response!==undefined) {
+            if(error.response.status===400 || error.response.status===401 || error.response.status===402){
+                alert("Link has expired. Please send the forgot password request again.")
             }else{
                 alert("An error occured at backend server. Please contact support!")
-                }
+            }
+        } else {
+            alert("An error occured at backend server. Please contact support!")    
         }
+     }
         
     }
 
@@ -77,14 +81,14 @@ export default function PasswordReset(){
         <div className="flex flex-col items-center justify-center min-h-screen bg-blue-100  ">
             {/* Heading Div*/}
             <img src={kalmaneTechImg} alt="Logo" className="h-[50px] bg-blue-100 mb-5"/>
-                <div className="flex-row min-w-[500px] min-h-[500px] m-5 items-center justify-center shadow-xl rounded-xl bg-white">
-                <div className="flex w-full h-[100px] justify-center items-center bg-blue-800 text-white rounded-t-xl">
-                    <h1 className=' text-xl font-bold text-center'>Password Reset</h1>
+                <div className="flex-row md:min-w-[500px] md:min-h-[500px] m-5 items-center justify-center shadow-xl rounded-xl bg-white">
+                <div className="flex w-full h-[50px] md:h-[100px] justify-center items-center bg-blue-800 text-white rounded-t-xl">
+                    <h1 className=' md:text-xl font-bold text-center'>Password Reset</h1>
                 </div> 
                     <form className="flex flex-col pt-[50px] justify-center items-center "  onSubmit={onSubmit}>
                         {/* <input type="text" placeholder="Email id" name="email" className="text-center m-3 border-2 border-gray-400 focus:border-black rounded-md  " onChange={(e)=>authContext.setEmail(e.target.value)} required></input> */}
                         <input type="text" placeholder="Password" name="Password" className="text-center m-3 border-2 border-gray-400 focus:border-black rounded-md " onChange={(e)=>setPassword(e.target.value)} required autoComplete="off"></input>
-                        <input type="password" placeholder="Password" name="Password" className="text-center m-3 border-2 border-gray-400 focus:border-black rounded-md " onChange={(e)=>setConfirmPassword(e.target.value)} autoComplete="off" required></input>
+                        <input type="password" placeholder="Confirm Password" name="Confirm Password" className="text-center m-3 border-2 border-gray-400 focus:border-black rounded-md " onChange={(e)=>setConfirmPassword(e.target.value)} autoComplete="off" required></input>
                         <button type="submit" className=" w-[150px] text-white my-3 py-2 rounded bg-blue-600 hover:bg-blue-900 transition"> Submit</button>
                         <div className="pb-2" >
                             <button type="button" className=" w-[150px] text-white m-3 p-2 rounded bg-blue-600 hover:bg-blue-900 transition"  onClick={onBack}>Back to Login</button>

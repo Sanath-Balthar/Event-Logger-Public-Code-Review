@@ -1,11 +1,11 @@
 // import { useNavigate } from "react-router-dom";
 import { useEventContext } from "../context/eventListContext";
-import ListEvents from "./ListEvents";
+import ListEvents from "../components/ListEvents";
 import { useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import axios from "axios";
-import { SideBar } from "./SideBar";
-import { Header } from "./Header";
+import { SideBar } from "../components/SideBar";
+import { Header } from "../components/Header";
 
 const API_URL = import.meta.env.VITE_BACKEND_API_URL;
 
@@ -39,22 +39,27 @@ export default function WidgetEvents(){
             authContext.setRole(response.data.role)
             if(response.data.allEvents){
                 eveContext.setList(response.data.allEvents);
-                
             } })
         .catch((err)=>{
             
-            const errData = err.response.data.error;
-            console.log("Error in fetchAllEvents: "+errData)
-            
-            if(errData=="Invalid token"){
-                authContext.setIsAuthenticated(false);
-                alert("Session Expired! Please login again")
-                localStorage.removeItem("Authenticated");
-                window.location.href="/"
-            }else if(errData=="Unauthorized"){
-                authContext.setIsAuthenticated(false);
-                alert("Forbidden, insufficient permissions!")
-                window.location.href="/dashboard"
+            if (err.response!==undefined) {
+                const errData = err.response.data.error;
+                console.log("Error in fetchRecentEvents: "+errData)
+                if(errData=="Invalid token"){
+                    alert("Session Expired! Please login again")
+                    localStorage.removeItem("Authenticated");
+                    window.location.href="/"
+                }else if(errData=="Unauthorized"){
+                    alert("Forbidden, insufficient permissions!")
+                    localStorage.removeItem("Authenticated");
+                    window.location.href="/dashboard"
+                }
+                else{
+                    alert("Issue at the backend server. Try again after logging out and logging in again or please contact support team")
+                }
+            }else{
+                console.log("Error in fetchRecentEvents: "+err)   
+                alert("Issue at the backend server. Try again after logging out and logging in again or please contact support team")
             }
             
         })         
@@ -80,16 +85,16 @@ export default function WidgetEvents(){
     return(
         <div className="bg-blue-200 w-full min-h-screen">
             {/* Heading Div*/}
-            <Header heading={`Events generated with ${selectedWidget} category`}/>
+                <Header heading={`Events generated with ${selectedWidget} category`}/>
 
             {/* <button type="submit" className="m-5 px-6 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition" onClick={onBack}>Back</button> */}
 
-            <div className="flex flex-row w-full justify-start">
-                 <div>
+            <div className="flex flex-row w-full justify-start min-h-screen">
+                <div className="flex flex-row min-h-screen">
                     <SideBar/>
                 </div> 
                 <div className="flex flex-row w-full justify-center items-center">
-                    <div className="flex-row w-1/2  h-full justify-center items-center">
+                    <div className="flex-row w-[90%] md:w-1/2  h-full justify-center items-center">
                         <ListEvents eventList= {selWidgetEvents} isDashboard={false}/>
                     </div>
                 </div>

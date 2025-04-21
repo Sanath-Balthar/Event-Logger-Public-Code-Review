@@ -70,10 +70,10 @@ export const SideBar = ()=>{
     }
 
     return(
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center min-h-screen">
            { 
            isSidebar?(
-            <div className="flex flex-col items-center w-[210px] min-h-screen pt-5 bg-blue-900 border-r-[5px] border-white">                    
+            <div className="flex flex-col items-center w-[210px] h-full pt-5 bg-blue-900 border-r-[5px] border-white">                    
 
                     <button data-testid="sidebar-button" type="button" onClick={()=>setSideBar(!isSidebar)} ><MenuOpenIcon fontSize="large" className="flex justify-center p-1 mx-[22px]  text-white bg-blue-900 rounded hover:bg-blue-100 hover:text-black transition"/></button>
                     
@@ -91,30 +91,30 @@ export const SideBar = ()=>{
                     </>
                     ):<></>
                 }
-                <button data-testid="logout-button" className="flex flex-row my-1 justify-start w-[90%] my-1 justify-center py-2 text-white font-bold bg-blue-900 rounded-md hover:bg-blue-100 hover:text-black transition" onClick={onLogout}><LogoutIcon className="mx-1"/><p className="mx-1">LogOut</p></button>                 
+                <button data-testid="logout-button" className="flex flex-row w-[90%] my-1 justify-center py-2 text-white font-bold bg-blue-900 rounded-md hover:bg-blue-100 hover:text-black transition" onClick={onLogout}><LogoutIcon className="mx-1"/><p className="mx-1">LogOut</p></button>                 
             </div>
             ):
-            <div className="flex flex-col items-center w-[50px] min-h-screen pt-5 bg-white">                    
+            <div className="flex flex-col items-center w-[25px] md:w-[50px] h-full pt-5 bg-white">                    
                 <div className="flex flex-row pb-2 justify-center text-center">
-                    <button data-testid="sidebar-button" type="button" onClick={()=>setSideBar(!isSidebar)} className="mx-2"><MenuIcon fontSize="large" className="text-black p-1  rounded hover:bg-blue-900 hover:text-white transition"/></button>
+                    <button data-testid="sidebar-button" type="button" onClick={()=>setSideBar(!isSidebar)} className="mx-2"><MenuIcon fontSize="large" className="text-black p-2 md:p-1  rounded hover:bg-blue-900 hover:text-white transition"/></button>
                 </div> 
-                <button data-testid="dashboard-button" className="flex flex-row justify-center  text-black my-1 py-2 rounded  hover:bg-blue-900 hover:text-white transition" onClick={onDashboard}><Dashboard className="mx-1" /></button>
+                <button data-testid="dashboard-button" className="flex flex-row justify-center  text-black my-1 py-2 rounded  hover:bg-blue-900 hover:text-white transition" onClick={onDashboard}><Dashboard className="mx-1 p-1 md:p-0" /></button>
                         
                 {   
                     authContext.role==="admin"?(
                     <>
-                        <button data-testid="customize-button"  className="flex flex-row justify-center  text-black my-1 py-2 rounded  hover:bg-blue-900 hover:text-white transition" onClick={onCustomize}><TuneIcon className="mx-1" /></button>
-                        <button data-testid="signupRequest-button" className="flex flex-row justify-center  text-black my-1 py-2 rounded  hover:bg-blue-900 hover:text-white transition" onClick={onSignUpRequest}><Grading className="mx-1"/></button>
+                        <button data-testid="customize-button"  className="flex flex-row justify-center  text-black my-1 py-2 rounded  hover:bg-blue-900 hover:text-white transition" onClick={onCustomize}><TuneIcon className="mx-1 p-1 md:p-0" /></button>
+                        <button data-testid="signupRequest-button" className="flex flex-row justify-center  text-black my-1 py-2 rounded  hover:bg-blue-900 hover:text-white transition" onClick={onSignUpRequest}><Grading className="mx-1 p-1 md:p-0"/></button>
                         {   
                             process.env.NODE_ENV==="development" ?
-                            <button data-testid="Delete-button" className="flex flex-row justify-center  text-black my-1 py-2 rounded  hover:bg-blue-900 hover:text-white transition" onClick={onDeleteEvents}><Delete className="mx-1"/></button>
+                            <button data-testid="Delete-button" className="flex flex-row justify-center  text-black my-1 py-2 rounded  hover:bg-blue-900 hover:text-white transition" onClick={onDeleteEvents}><Delete className="mx-1 p-1 md:p-0"/></button>
                             :<></>
                         }
                         
                     </>
                     ):<></>
                 }
-                <button data-testid="logout-button" className="flex flex-row justify-center text-black my-1 py-2 rounded hover:bg-blue-900 hover:text-white transition" onClick={onLogout}><LogoutIcon className="mx-1"/></button>                 
+                <button data-testid="logout-button" className="flex flex-row justify-center text-black my-1 py-2 rounded hover:bg-blue-900 hover:text-white transition" onClick={onLogout}><LogoutIcon className="mx-1 p-1 md:p-0"/></button>                 
             </div>
             }
           
